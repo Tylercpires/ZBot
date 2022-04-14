@@ -9,6 +9,27 @@ client = commands.Bot(command_prefix = '.', intents = intents)
 
 #Commands
 
+@client.command()
+async def clear(ctx, n):
+	'''Clears n amount of messages from any given channel'''
+	permissionswitch = 0
+	if str.isnumeric(n)==False:
+		await ctx.channel.send('Please pass in an integer amount.')
+		return
+	n = int(n)
+	for x in ctx.author.roles:
+		if x.permissions.manage_messages == True:
+			permissionswitch = 1
+			break
+	if permissionswitch == 1:
+		await ctx.channel.purge(limit=n+1)
+		if n==1:
+			await ctx.channel.send(f'Cleared {n} message.')
+		else:
+			await ctx.channel.send(f'Cleared {n} messages.')
+	else:
+		await ctx.channel.send('You do not have permission to manage messages.')
+
 voiceclient = None
 
 @client.command()
@@ -58,7 +79,7 @@ async def on_member_join(member):
 	print(f'{member.name} just joined the server!') #Message to terminal
 	currentguild = client.get_guild(int(os.environ['ServerID'])) 
 	welcomechannel = currentguild.get_channel(int(os.environ['WelcomeChannelID']))
-	await welcomechannel.send(f'A wild {member.name} just appeared!') #Message to welcome channel
+	await welcomechannel.send(f'A wild @{member.name} just appeared!') #Message to welcome channel
 	memberrole = currentguild.get_role(int(os.environ['MemberRoleID']))
 	await member.add_roles(memberrole) #Adds "Member" role to user
 
