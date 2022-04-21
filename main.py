@@ -62,11 +62,9 @@ async def leave(ctx):
 	'''Makes the bot leave the channel it's in'''
 	currentguild = client.get_guild(int(os.environ['ServerID'])) #Current server instance
 	clientmember = currentguild.get_member(int(os.environ['ClientID'])) #Bot instance
-	#voiceclient = None #Initialization for bot's voiceclient; needed for cleanup()
 	currentchannel = ctx.channel #Text channel the command was sent in
 	if isinstance(clientmember.voice, discord.VoiceState):
-		server = ctx.message.guild.voice_client
-		await server.disconnect()
+		await clientmember.move_to(None)
 	else:
 		await currentchannel.send('I am not currently in a channel.')
 	
@@ -95,5 +93,5 @@ async def on_member_remove(member):
 	welcomechannel = currentguild.get_channel(int(os.environ['WelcomeChannelID']))
 	await welcomechannel.send(f'Say goodbye to {member.name}. They just left the server!') #Message to welcome channel
 
-stay_online()
+#stay_online() #Keep this line commented while making changes
 client.run(os.environ['Token'])
