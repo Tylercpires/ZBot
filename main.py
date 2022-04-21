@@ -3,6 +3,7 @@
 import discord
 from discord.ext import commands
 import os
+from webserver import stay_online
 
 intents = discord.Intents().all()
 client = commands.Bot(command_prefix = '.', intents = intents)
@@ -29,6 +30,9 @@ async def clear(ctx, n):
 			await ctx.channel.send(f'Cleared {n} messages.')
 	else:
 		await ctx.channel.send('You do not have permission to manage messages.')
+
+#@client.command()
+#async def 
 
 voiceclient = None
 
@@ -90,5 +94,6 @@ async def on_member_remove(member):
 	currentguild = client.get_guild(int(os.environ['ServerID'])) 
 	welcomechannel = currentguild.get_channel(int(os.environ['WelcomeChannelID']))
 	await welcomechannel.send(f'Say goodbye to {member.name}. They just left the server!') #Message to welcome channel
-	
+
+stay_online()
 client.run(os.environ['Token'])
