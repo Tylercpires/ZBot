@@ -1,0 +1,96 @@
+#T. Pires - Zenith Server Discord Bot - 2022/04/08
+#Last updated 2022/04/25
+
+import discord
+from discord.ext import commands
+import os
+from webserver import stay_online
+
+intents = discord.Intents().all()
+client = commands.Bot(command_prefix = '.', intents = intents)
+
+#Commands
+
+@client.command()
+async def clear(ctx, n):
+	'''Clears n amount of messages from any given channel'''
+	permissionswitch = 0
+	if str.isnumeric(n)==False:
+		await ctx.channel.send('Please pass in an integer amount.')
+		return
+	n = int(n)
+	for x in ctx.author.roles:
+		if x.permissions.manage_messages == True:
+			permissionswitch = 1
+			break
+	if permissionswitch == 1:
+		await ctx.channel.purge(limit=n+1)
+		if n==1:
+			await ctx.channel.send(f'Cleared {n} message.')
+		else:
+			await ctx.channel.send(f'Cleared {n} messages.')
+	else:
+		await ctx.channel.send('You do not have permission to manage messages.')
+
+#@client.command()
+#async def 
+
+@client.command()
+async def join(ctx):
+	'''Makes the bot join the users current voice channel'''
+	currentguild = client.get_guild(int(os.environ['ServerID'])) #Current server instance
+	clientmember = currentguild.get_member(int(os.environ['ClientID'])) #Bot instance
+	voiceclient = None #Initialization for bot's voiceclient; needed for cleanup()
+	currentchannel = ctx.channel #Text channel the command was sent in
+	if isinstance(ctx.author.voice, discord.VoiceState):
+		voicechannel = ctx.author.voice.channel
+		if clientmember.voice == None:
+			voiceclient = await voicechannel.connect()
+			voiceclient.cleanup()
+		elif clientmember.voice.channel != voicechannel:
+			voiceclient = await clientmember.move_to(voicechannel)
+			voiceclient.cleanup()
+		else: 
+			await currentchannel.send('I\'m already here!')
+	else:
+		await currentchannel.send('You aren\'t in a voice channel!')
+		return
+
+@client.command()
+async def leave(ctx):
+	'''Makes the bot leave the channel it's in'''
+	currentguild = client.get_guild(int(os.environ['ServerID'])) #Current server instance
+	clientmember = currentguild.get_member(int(os.environ['ClientID'])) #Bot instance
+	currentchannel = ctx.channel #Text channel the command was sent in
+	if isinstance(clientmember.voice, discord.VoiceState):
+		await clientmember.move_to(None)
+	else:
+		await currentchannel.send('I am not currently in a channel.')
+	
+#Events
+
+@client.event
+async def on_ready():
+	'''Sends message to terminal on successful startup'''
+	print('ZBot started successfully!')
+
+@client.event
+async def on_member_join(member):
+	'''Sends message to terminal and welcome channel, and adds user to "Member" role on user joining the server'''
+	print(f'{member.name} just joined the server!') #Message to terminal
+	currentguild = client.get_guild(int(os.environ['ServerID'])) 
+	welcomechannel = currentguild.get_channel(int(os.environ['WelcomeChannelID']))
+	await welcomechannel.send(f'A wild @{member.name} just appeared!') #Message to welcome channel
+	memberrole = currentguild.get_role(int(os.environ['MemberRoleID']))
+	await member.add_roles(memberrole) #Adds "Member" role to user
+
+@client.event
+async def on_member_remove(member):
+	'''Sends message to terminal and welcome channel, on user leaving the server'''
+	print(f'{member.name} just left the server!') #Message to terminal
+	currentguild = client.get_guild(int(os.environ['ServerID'])) 
+	welcomechannel = currentguild.get_channel(int(os.environ['WelcomeChannelID']))
+	await welcomechannel.send(f'Say goodbye to {member.name}. They just left the server!') #Message to welcome channel
+
+#stay_online() #Keep this line commented while making changes
+client.run(os.environ['Token'])
