@@ -16,4 +16,3 @@ class Bot(commands.Bot):
 			if file.endswith(".py"):
 				self.load_extension(f"cogs.{file[:-3]}") #Loads any files that end with .py
 				print(f"Loaded {file}.")
-			
