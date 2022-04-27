@@ -9,11 +9,14 @@ server = Flask('')
 
 @server.route('/')
 def online_message():
+	'''Displays the below message in the Flask webserver.'''
 	return 'ZBot is currently online.'
 
 def run():
+	'''Starts the Flask server.'''
 	server.run(host='0.0.0.0', port=8080)
 
 def stay_online():
+	'''Keeps the flask server running (used in tandem with UptimeRobot).'''
 	thread = Thread(target=run)
 	thread.start()

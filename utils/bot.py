@@ -1,10 +1,11 @@
 from discord.ext import commands
 import os
 from utils import config
+from utils.timeutils import currentdatetime
 
 class Bot(commands.Bot):
 
-	print("Attempting to start Zenith Bot...")
+	print(f"{currentdatetime()}Attempting to start Zenith Bot...")
 
 	def __init__(self):
 		super().__init__(
@@ -15,4 +16,4 @@ class Bot(commands.Bot):
 		for file in os.listdir("./cogs"): #Loops through "cogs" folder
 			if file.endswith(".py"):
 				self.load_extension(f"cogs.{file[:-3]}") #Loads any files that end with .py
-				print(f"Loaded {file}.")
+				print(f"{currentdatetime()}Loaded {file}.")
