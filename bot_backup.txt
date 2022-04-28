@@ -66,23 +66,6 @@ async def leave(ctx):
 		await clientmember.move_to(None)
 	else:
 		await currentchannel.send('I am not currently in a channel.')
-	
-#Events
-
-@client.event
-async def on_ready():
-	'''Sends message to terminal on successful startup'''
-	print('ZBot started successfully!')
-
-@client.event
-async def on_member_join(member):
-	'''Sends message to terminal and welcome channel, and adds user to "Member" role on user joining the server'''
-	print(f'{member.name} just joined the server!') #Message to terminal
-	currentguild = client.get_guild(int(os.environ['ServerID'])) 
-	welcomechannel = currentguild.get_channel(int(os.environ['WelcomeChannelID']))
-	await welcomechannel.send(f'A wild @{member.name} just appeared!') #Message to welcome channel
-	memberrole = currentguild.get_role(int(os.environ['MemberRoleID']))
-	await member.add_roles(memberrole) #Adds "Member" role to user
 
 @client.event
 async def on_member_remove(member):
@@ -91,6 +74,3 @@ async def on_member_remove(member):
 	currentguild = client.get_guild(int(os.environ['ServerID'])) 
 	welcomechannel = currentguild.get_channel(int(os.environ['WelcomeChannelID']))
 	await welcomechannel.send(f'Say goodbye to {member.name}. They just left the server!') #Message to welcome channel
-
-#stay_online() #Keep this line commented while making changes
-client.run(os.environ['Token'])
